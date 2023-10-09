@@ -9,6 +9,7 @@ const Auth = ({ func }) => {
     try {
       const result = await signInWithPopup(auth, provider);
       cookie.set("userToken", result.user.refreshToken);
+      console.log(result);
       func(true);
     } catch (err) {
       console.error(err);
