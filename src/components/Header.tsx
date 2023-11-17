@@ -14,11 +14,14 @@ const Header = ({ func }) => {
   };
 
   return (
-    <div className="header">
+    <div className="header bg-black bg-opacity-25">
       <h1 className="header-logo my-auto">
         PASSWORD<span>STASH</span>
       </h1>
-      <button onClick={handleClick} className=" btn bg-white my-auto fw-bolder">
+      <button
+        onClick={handleClick}
+        className=" btn btn-light my-auto fw-bolder"
+      >
         INFO
       </button>
       <LogOut func={func} />

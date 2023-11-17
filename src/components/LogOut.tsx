@@ -12,7 +12,7 @@ const LogOut = ({ func }) => {
   };
   return (
     <div className=" p-3 d-flex flex-column ">
-      <button className="btn bg-white mx-auto fw-bolder" onClick={logOut}>
+      <button className="btn btn-light mx-auto fw-bolder" onClick={logOut}>
         <img
           className="px-1"
           src="https://img.icons8.com/color/16/000000/google-logo.png"

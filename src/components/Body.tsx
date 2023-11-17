@@ -2,17 +2,32 @@ import React, { useState, useEffect, useRef } from "react";
 import { useEncrypt } from "../hooks/useEncrypt";
 import { useDecrypt } from "../hooks/useDecrypt";
 import {
-  addDoc,
   collection,
+  doc,
   query,
   where,
-  onSnapshot,
   DocumentData,
+  CollectionReference,
 } from "firebase/firestore";
+import {
+  useFirestoreQueryData,
+  useFirestoreCollectionMutation,
+  useFirestoreDocumentMutation,
+} from "@react-query-firebase/firestore";
 import { db } from "../firebase-config";
 import Cookies from "universal-cookie";
+// import { Unsubscribe } from "firebase/auth";
 
 const cookie = new Cookies();
+
+const HideDoc = ({ id, collectionRef }) => {
+  const docRef = doc(collectionRef, id);
+  const mutateDoc = useFirestoreDocumentMutation(docRef, { merge: true });
+
+  return (
+    <button onClick={() => mutateDoc.mutate({ hidden: true })}>Hide</button>
+  );
+};
 
 const Body = () => {
   const [fieldOne, setFieldOne] = useState("");
@@ -20,17 +35,46 @@ const Body = () => {
   const [fieldThree, setFieldThree] = useState("");
   const [keyWord, setKeyword] = useState("");
   const [passKey, setPassKey] = useState("");
-  const [entries, setEntries] = useState<DocumentData>([]);
+  // const [entries, setEntries] = useState<DocumentData>([]);
+  const [visibleOnly, setVisibleOnly] = useState<boolean>(true);
 
-  const passKeyRef = useRef(null);
+  const [passwort, setPassword] = useState();
 
   const decrypt = useDecrypt();
   const encrypt = useEncrypt();
 
-  const entriesRef = collection(db, "collectiontest");
+  const entriesRef = collection(db, "data");
+
+  const mutateCollection = useFirestoreCollectionMutation(entriesRef);
   const user = cookie.get("userToken");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const { data } = useFirestoreQueryData(["data"], entriesRef, {
+    subscribe: true,
+    idField: "_id",
+  });
+
+  const tableRow = (item) => {
+    return (
+      <tr key={item._id}>
+        <td>
+          {passKey === "" ? item.fieldOne : decrypt(item.fieldOne, passKey)}
+        </td>
+        <td>
+          {passKey === "" ? item.fieldTwo : decrypt(item.fieldTwo, passKey)}
+        </td>
+        <td>
+          {passKey === "" ? item.fieldThree : decrypt(item.fieldThree, passKey)}
+        </td>
+        <td>
+          {item.hidden ? null : (
+            <HideDoc id={item._id} collectionRef={entriesRef} />
+          )}
+        </td>
+      </tr>
+    );
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const formData = {
       user,
@@ -41,39 +85,24 @@ const Body = () => {
     };
 
     if (formData) {
-      await addDoc(entriesRef, formData).then(() => console.log("pushed"));
+      mutateCollection.mutate(formData);
       setFieldOne("");
       setFieldTwo("");
       setFieldThree("");
     }
   };
 
-  useEffect(() => {
-    const queries = query(entriesRef, where("user", "==", user));
+  const handleHide = (id) => {};
 
-    // Initialize an empty array with the specified type
-    const tempV: DocumentData[] = [];
-
-    const unsubscribe = onSnapshot(queries, (snapShot) => {
-      snapShot.forEach((doc) => {
-        tempV.push(doc.data() as DocumentData);
-      });
-
-      // Update the state with the new entries
-      setEntries(tempV);
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
+  const handlePassKeySet = (e) => {
+    e.preventDefault();
+    setPassKey(e.target.inputField.value);
+  };
   return (
     <>
       <form
         onSubmit={handleSubmit}
-        className="d-flex justify-content-center mt-3"
-        style={{ backgroundColor: " rgba(0, 0, 0, 0.2)" }}
+        className="d-flex justify-content-center mt-3 bg-black bg-opacity-25"
       >
         <div className="m-3 d-flex flex-column">
           <label htmlFor="login" className="htmlForm-label text-white mx-auto">
@@ -146,25 +175,61 @@ const Body = () => {
           SUBMIT
         </button>
       </form>
-      <input type="text" ref={passKeyRef} />
-      <button onClick={() => setPassKey(passKeyRef.current.value)}>Go</button>
-      <ul>
-        {entries.map((item: DocumentData, index: number) => (
-          <li key={index} className="text-white">
-            <p>
-              {passKey === "" ? item.fieldOne : decrypt(item.fieldOne, passKey)}
-            </p>
-            <p>
-              {passKey === "" ? item.fieldTwo : decrypt(item.fieldTwo, passKey)}
-            </p>
-            <p>
-              {passKey === ""
-                ? item.fieldThree
-                : decrypt(item.fieldThree, passKey)}
-            </p>
-          </li>
-        ))}
-      </ul>
+
+      <div className="bg-black bg-opacity-25">
+        <div className="d-flex justify-content-center">
+          <form onSubmit={handlePassKeySet}>
+            <div className=" input-group input-group-sm my-auto w-25">
+              <span className="input-group-text">KEY</span>
+              <input
+                className="form-control"
+                type="text"
+                name="inputField"
+                placeholder="Your secret key"
+              />
+            </div>
+            <button className="btn btn-sm bg-white m-3 fw-bolder" type="submit">
+              DECODE
+            </button>
+          </form>
+          <div className="m-3 d-flex flex-column">
+            <label
+              htmlFor="login"
+              className="htmlForm-label text-white mx-auto"
+            >
+              Visible only
+            </label>
+            <input
+              checked={visibleOnly}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setVisibleOnly(e.target.checked)
+              }
+              type="checkbox"
+              className="htmlForm-control"
+              id="login"
+              aria-describedby="emailHelp"
+            />
+          </div>
+        </div>
+
+        <table className="table table-primary table-striped">
+          <thead>
+            <tr className="table-info">
+              <th scope="col">First field</th>
+              <th scope="col">Second field</th>
+              <th scope="col">Third field</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {visibleOnly
+              ? data
+                  ?.filter((item) => item.hidden === false)
+                  .map((item: DocumentData) => tableRow(item))
+              : data?.map((item: DocumentData) => tableRow(item))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 };
