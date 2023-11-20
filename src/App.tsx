@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Auth from "./components/Auth";
 import Header from "./components/Header";
+import Form from "./components/Form";
 import Body from "./components/Body";
 import Cookies from "universal-cookie";
 
@@ -18,10 +19,11 @@ function App() {
   return (
     <>
       {isLoggedIn ? (
-        <>
+        <main>
           <Header func={setIsLoggedIn} />
+          <Form />
           <Body />
-        </>
+        </main>
       ) : (
         <Auth func={setIsLoggedIn} />
       )}

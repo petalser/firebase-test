@@ -14,18 +14,26 @@ const Header = ({ func }) => {
   };
 
   return (
-    <div className="header bg-black bg-opacity-25">
-      <h1 className="header-logo my-auto">
+    <header
+      className="
+    d-flex 
+    flex-column 
+    flex-lg-row 
+    justify-content-center  
+    justify-content-lg-around
+    bg-black 
+    bg-opacity-25"
+    >
+      <h1 className="header-logo mx-auto mx-lg-0">
         PASSWORD<span>STASH</span>
       </h1>
-      <button
-        onClick={handleClick}
-        className=" btn btn-light my-auto fw-bolder"
-      >
+
+      <button onClick={handleClick} className="btn btn-light my-2 fw-bolder ">
         INFO
       </button>
+
       <LogOut func={func} />
-    </div>
+    </header>
   );
 };
 

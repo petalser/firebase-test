@@ -18,7 +18,7 @@ const Auth = ({ func }) => {
     }
   };
   return (
-    <main className="mx-auto my-auto  container text-white">
+    <main className="mx-auto my-auto container text-white">
       <div className="row">
         <h1>
           Welcome to{" "}
