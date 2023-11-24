@@ -1,16 +1,26 @@
 import LogOut from "./LogOut";
 import "./Header.css";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, query, doc } from "firebase/firestore";
 import { db } from "../firebase-config";
 
 const Header = ({ func }) => {
-  //this handler made for cleaning up the collection
-  //TODO: remove this and create description
+  const collectionRef = collection(db, "data");
+
   const handleClick = async () => {
-    const querySnapshot = await getDocs(collection(db, "collectiontest"));
-    querySnapshot.forEach((docum) => {
-      deleteDoc(doc(db, "collectiontest", docum.id));
-    });
+    try {
+      const querySnapshot = await getDocs(collectionRef);
+      querySnapshot.forEach(async (doc) => {
+        try {
+          const docRef = doc.ref; // Access the document reference directly
+          await deleteDoc(docRef);
+          console.log("Document successfully deleted:", doc.id);
+        } catch (error) {
+          console.error("Error deleting document:", error);
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+    }
   };
 
   return (

@@ -3,19 +3,26 @@ import { useDecrypt } from "../hooks/useDecrypt";
 import {
   collection,
   doc,
-  query,
   where,
   DocumentData,
   CollectionReference,
+  query,
 } from "firebase/firestore";
 import {
   useFirestoreQueryData,
   useFirestoreDocumentMutation,
 } from "@react-query-firebase/firestore";
 import { db } from "../firebase-config";
-import { Unsubscribe } from "firebase/auth";
+import Cookies from "universal-cookie";
 
-const HideDoc = ({ id, collectionRef }) => {
+const cookie = new Cookies();
+
+interface IHideButton {
+  id: string;
+  collectionRef: CollectionReference;
+}
+
+const HideButton: React.FC<IHideButton> = ({ id, collectionRef }) => {
   const docRef = doc(collectionRef, id);
   const mutateDoc = useFirestoreDocumentMutation(docRef, { merge: true });
 
@@ -25,198 +32,107 @@ const HideDoc = ({ id, collectionRef }) => {
 };
 
 const Body = () => {
+  const [inputValue, setinputValue] = useState("");
   const [passKey, setPassKey] = useState("");
   const [visibleOnly, setVisibleOnly] = useState<boolean>(true);
 
-  const [password, setPassword] = useState();
-
   const decrypt = useDecrypt();
 
-  const entriesRef = collection(db, "data");
+  const uid = cookie.get("userToken");
+  const entriesRef: CollectionReference = collection(db, "data");
+  const queryRef = query(entriesRef, where("user", "==", uid));
 
-  const { data } = useFirestoreQueryData(["data"], entriesRef, {
+  const { data } = useFirestoreQueryData(["data"], queryRef, {
     subscribe: true,
     idField: "_id",
   });
 
-  const tableRow = (item) => {
+  //returns markup (table row with 3 pre-filled table cells)
+  const tableRow = (item: DocumentData) => {
     return (
       <tr key={item._id}>
-        <td>
+        <td className="text-break">
           {passKey === "" ? item.fieldOne : decrypt(item.fieldOne, passKey)}
         </td>
-        <td>
+        <td className="text-break">
           {passKey === "" ? item.fieldTwo : decrypt(item.fieldTwo, passKey)}
         </td>
-        <td>
+        <td className="text-break">
           {passKey === "" ? item.fieldThree : decrypt(item.fieldThree, passKey)}
         </td>
         <td>
           {item.hidden ? null : (
-            <HideDoc id={item._id} collectionRef={entriesRef} />
+            <HideButton id={item._id} collectionRef={entriesRef} />
           )}
         </td>
       </tr>
     );
   };
-  //   e.preventDefault();
-  //   const formData = {
-  //     user,
-  //     fieldOne: encrypt(fieldOne, keyWord),
-  //     fieldTwo: encrypt(fieldTwo, keyWord),
-  //     fieldThree: encrypt(fieldThree, keyWord),
-  //     hidden: false,
-  //   };
 
-  //   if (formData) {
-  //     mutateCollection.mutate(formData);
-  //     setFieldOne("");
-  //     setFieldTwo("");
-  //     setFieldThree("");
-  //   }
-  // };
-
-  const handleHide = (id) => {};
-
-  const handlePassKeySet = (e) => {
+  const handlePassKeySet = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setPassKey(e.target.inputField.value);
+    console.log(inputValue);
+    setPassKey(inputValue);
   };
+
   return (
-    <>
-      {/* <form
-        onSubmit={handleSubmit}
-        className="d-grid my-3 mx-auto bg-black bg-opacity-25"
+    <section className="bg-black bg-opacity-25 d-flex flex-column">
+      <form
+        onSubmit={handlePassKeySet}
+        className="d-flex justify-content-center"
       >
-        <div className="row justify-content-center">
-          <div className="col-lg-4 p-3">
-            <label
-              htmlFor="login"
-              className="htmlForm-label p-1 d-flex flex-column text-white"
-            >
-              Login
-              <input
-                value={fieldOne}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setFieldOne(e.target.value)
-                }
-                type="text"
-                className="htmlForm-control"
-                id="login"
-                aria-describedby="emailHelp"
-              />
-            </label>
-
-            <label
-              htmlFor="password"
-              className="htmlForm-label p-1 d-flex flex-column text-white"
-            >
-              Password
-              <input
-                value={fieldTwo}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setFieldTwo(e.target.value)
-                }
-                type="text"
-                className="htmlForm-control"
-                id="password"
-              />
-            </label>
-
-            <label
-              htmlFor="description"
-              className="htmlForm-label p-1 d-flex flex-column text-white"
-            >
-              Description
-              <input
-                value={fieldThree}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setFieldThree(e.target.value)
-                }
-                type="text"
-                className="htmlForm-control"
-                id="description"
-              />
-            </label>
-          </div>
-          <div className="col-lg-4 p-3">
-            <label
-              htmlFor="description"
-              className="htmlForm-label p-1 bg-danger d-flex flex-column text-white"
-            >
-              Keyword
-              <input
-                value={keyWord}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setKeyword(e.target.value)
-                }
-                type="text"
-                className="htmlForm-control"
-                id="keyword"
-              />
-            </label>
-
-            <button type="submit" className="btn btn-light mx-2 fw-bolder">
-              SUBMIT
-            </button>
-          </div>
-        </div>
-      </form> */}
-
-      <div className="bg-black bg-opacity-25 d-flex flex-column">
-        <form
-          onSubmit={handlePassKeySet}
-          className="d-flex justify-content-center"
-        >
-          <div className=" input-group input-group-sm my-auto d-flex w-25">
-            <span className="input-group-text">KEY</span>
-            <input
-              className="form-control"
-              type="text"
-              name="inputField"
-              placeholder="Your secret key"
-            />
-          </div>
-          <button className="btn btn-sm bg-white m-3 fw-bolder" type="submit">
-            DECODE
-          </button>
-        </form>
-        <label
-          htmlFor="toggleVisibility"
-          className="htmlForm-label text-white mx-auto"
-        >
-          Visible only{" "}
+        <div className=" input-group input-group-sm my-auto d-flex w-25">
+          <span className="input-group-text">KEY</span>
           <input
-            checked={visibleOnly}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setVisibleOnly(e.target.checked)
-            }
-            type="checkbox"
-            className="htmlForm-control"
-            id="toggleVisibility"
-            aria-describedby="emailHelp"
+            className="form-control"
+            type="text"
+            name="inputField"
+            placeholder="Your secret key"
+            onChange={(e) => {
+              setinputValue(e.target.value);
+            }}
           />
-        </label>
+        </div>
+        <button className="btn btn-sm bg-white m-3 fw-bolder" type="submit">
+          DECODE
+        </button>
+      </form>
 
-        <table className="table table-primary table-striped">
-          <thead>
-            <tr className="table-info">
-              <th scope="col">First field</th>
-              <th scope="col">Second field</th>
-              <th scope="col">Third field</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {visibleOnly
-              ? data
-                  ?.filter((item) => item.hidden === false)
-                  .map((item: DocumentData) => tableRow(item))
-              : data?.map((item: DocumentData) => tableRow(item))}
-          </tbody>
-        </table>
-      </div>
-    </>
+      <label
+        htmlFor="toggleVisibility"
+        className="htmlForm-label text-white mx-auto"
+      >
+        Visible only{" "}
+        <input
+          checked={visibleOnly}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setVisibleOnly(e.target.checked)
+          }
+          type="checkbox"
+          className="htmlForm-control"
+          id="toggleVisibility"
+          aria-describedby="emailHelp"
+        />
+      </label>
+
+      <table className="table table-primary table-striped">
+        <thead>
+          <tr className="table-info">
+            <th scope="col">First field</th>
+            <th scope="col">Second field</th>
+            <th scope="col">Third field</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {visibleOnly
+            ? data
+                ?.filter((item) => item.hidden === false)
+                .map((item: DocumentData) => tableRow(item))
+            : data?.map((item: DocumentData) => tableRow(item))}
+        </tbody>
+      </table>
+    </section>
   );
 };
 

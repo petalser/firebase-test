@@ -6,12 +6,16 @@ import "./Header.css";
 
 const cookie = new Cookies();
 
-const Auth = ({ func }) => {
+type AuthProps = {
+  func: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const Auth: React.FC<AuthProps> = ({ func }) => {
   const signIn = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
       cookie.set("userToken", result.user.uid);
-      console.log(result);
+      console.log(result.user.uid, "User UID");
       func(true);
     } catch (err) {
       console.error(err);

@@ -12,6 +12,7 @@ const Form = () => {
   const [fieldTwo, setFieldTwo] = useState("");
   const [fieldThree, setFieldThree] = useState("");
   const [keyword, setKeyword] = useState("");
+  const [keywordIsTooShort, setKeywordIsTooShort] = useState(false);
 
   const entriesRef = collection(db, "data");
 
@@ -31,12 +32,20 @@ const Form = () => {
       hidden: false,
     };
 
-    if (formData) {
-      mutateCollection.mutate(formData);
+    if (fieldOne === "" && fieldTwo === "" && fieldThree === "") {
+      alert("Please, fill in at least one field");
+    }
+
+    const mutation = (data) => {
+      mutateCollection.mutate(data);
       setFieldOne("");
       setFieldTwo("");
       setFieldThree("");
-    }
+    };
+
+    keyword.length > 1
+      ? (mutation(formData), setKeywordIsTooShort(false))
+      : setKeywordIsTooShort(true);
   };
 
   return (
@@ -50,7 +59,7 @@ const Form = () => {
             htmlFor="login"
             className="htmlForm-label p-1 d-flex flex-column text-white"
           >
-            Login
+            Field 1 (e.g. login, email, etc.)
             <input
               value={fieldOne}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -67,7 +76,7 @@ const Form = () => {
             htmlFor="password"
             className="htmlForm-label p-1 d-flex flex-column text-white"
           >
-            Password
+            Field 2 (e.g. password)
             <input
               value={fieldTwo}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -83,7 +92,7 @@ const Form = () => {
             htmlFor="description"
             className="htmlForm-label p-1 d-flex flex-column text-white"
           >
-            Description
+            Field 3 (e.g. description)
             <input
               value={fieldThree}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -98,9 +107,13 @@ const Form = () => {
         <div className="col-lg-4 p-3">
           <label
             htmlFor="description"
-            className="htmlForm-label p-1 bg-danger d-flex flex-column text-white"
+            className={`htmlForm-label p-1 d-flex flex-column text-white ${
+              keywordIsTooShort ? "bg-danger" : "bg-warning"
+            }`}
           >
-            Keyword
+            {keywordIsTooShort
+              ? "Keyword must be at least 2 characters long"
+              : "Keyword (must be at least 2 characters long)"}
             <input
               value={keyword}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
