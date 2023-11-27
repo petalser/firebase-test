@@ -71,12 +71,11 @@ const Body = () => {
 
   const handlePassKeySet = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(inputValue);
     setPassKey(inputValue);
   };
 
   return (
-    <section className="bg-black bg-opacity-25 d-flex flex-column">
+    <section className="bg-black bg-opacity-25 d-flex flex-column mb-3">
       <form
         onSubmit={handlePassKeySet}
         className="d-flex justify-content-center"

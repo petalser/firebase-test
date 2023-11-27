@@ -1,4 +1,5 @@
 import { auth, provider } from "../firebase-config";
+import { useAppContext } from "../hooks/useAppContext";
 import { signInWithPopup } from "firebase/auth";
 import Cookies from "universal-cookie";
 
@@ -6,17 +7,14 @@ import "./Header.css";
 
 const cookie = new Cookies();
 
-type AuthProps = {
-  func: React.Dispatch<React.SetStateAction<boolean>>;
-};
+const Auth = () => {
+  const { setIsLoggedIn } = useAppContext();
 
-const Auth: React.FC<AuthProps> = ({ func }) => {
   const signIn = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
       cookie.set("userToken", result.user.uid);
-      console.log(result.user.uid, "User UID");
-      func(true);
+      setIsLoggedIn(true);
     } catch (err) {
       console.error(err);
     }
@@ -58,8 +56,11 @@ const Auth: React.FC<AuthProps> = ({ func }) => {
             your own taste: for "login/password/description", or "name/phone
             number", or any else.
             <br />
-            Please, note that this application made for learning purpose and we
-            can not guarantee that it is 100% secure.
+            Please, note that{" "}
+            <strong>
+              this application made for learning purpose and we cannot guarantee
+              that it is 100% secure.
+            </strong>
           </p>
         </div>
       </div>

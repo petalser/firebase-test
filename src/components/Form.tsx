@@ -1,7 +1,7 @@
 import { useEncrypt } from "../hooks/useEncrypt";
 import { useState } from "react";
 import { useFirestoreCollectionMutation } from "@react-query-firebase/firestore";
-import { collection } from "firebase/firestore";
+import { DocumentData, collection } from "firebase/firestore";
 import { db } from "../firebase-config";
 import Cookies from "universal-cookie";
 
@@ -24,7 +24,7 @@ const Form = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = {
+    const formData: DocumentData = {
       user,
       fieldOne: encrypt(fieldOne, keyword),
       fieldTwo: encrypt(fieldTwo, keyword),
@@ -36,14 +36,14 @@ const Form = () => {
       alert("Please, fill in at least one field");
     }
 
-    const mutation = (data) => {
+    const mutation = (data: DocumentData) => {
       mutateCollection.mutate(data);
       setFieldOne("");
       setFieldTwo("");
       setFieldThree("");
     };
 
-    keyword.length > 1
+    keyword.length > 3
       ? (mutation(formData), setKeywordIsTooShort(false))
       : setKeywordIsTooShort(true);
   };
@@ -51,7 +51,7 @@ const Form = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="d-grid my-3 mx-auto bg-black bg-opacity-25"
+      className="d-grid mb-3 mx-auto bg-black bg-opacity-25"
     >
       <div className="row justify-content-center">
         <div className="col-lg-4 p-3">

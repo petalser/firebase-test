@@ -1,27 +1,22 @@
-# React + TypeScript + Vite
+# PASSWORDSTASH
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+[Try](https://passwordstash.netlify.app/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## Summary
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+This app designed to help you store your sensitive information in protected way. After login, you'll get 3 text fields for your data and one - for secret. On submit your data will be encoded with given "secret" and sent to database. Secret word and at least one field must be filled to submit. Use given fields on your own taste: for "login/password/description", or "name/phone number", or any else.
 
-- Configure the top-level `parserOptions` property like this:
+---
 
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
-```
+## Features
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+- **React.js** with TypeScript;
+- **React Context API** for state management;
+- **Firebase Auth** for authentication;
+- **Firebase Firestore** for storing data;
+- **Bootstrap** for styling;
+- Crypto.js, universal-cookie, custom hooks etc.

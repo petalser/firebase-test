@@ -1,34 +1,41 @@
-import { useEffect, useState } from "react";
 import Auth from "./components/Auth";
-import Header from "./components/Header";
-import Form from "./components/Form";
 import Body from "./components/Body";
-import Cookies from "universal-cookie";
-
-const cookie = new Cookies();
+import Form from "./components/Form";
+import Header from "./components/Header";
+import Info from "./components/Info";
+import { AppProvider } from "./components/ContextProvider";
+import { useAppContext } from "./hooks/useAppContext";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    if (cookie.get("userToken")) {
-      setIsLoggedIn(true);
-    }
-  }, [isLoggedIn]);
+  const { showInfo, isLoggedIn } = useAppContext();
 
   return (
     <>
       {isLoggedIn ? (
         <main>
-          <Header func={setIsLoggedIn} />
-          <Form />
-          <Body />
+          <Header />
+          {showInfo ? (
+            <Info />
+          ) : (
+            <>
+              <Form />
+              <Body />
+            </>
+          )}
         </main>
       ) : (
-        <Auth func={setIsLoggedIn} />
+        <Auth />
       )}
     </>
   );
 }
 
-export default App;
+const Root = () => {
+  return (
+    <AppProvider>
+      <App />
+    </AppProvider>
+  );
+};
+
+export default Root;

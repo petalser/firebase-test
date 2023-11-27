@@ -1,10 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Dela+Gothic+One&display=swap");
 
-.header {
-  display: flex;
-  justify-content: space-around;
-}
-
 .header-logo {
   font-family: "Dela Gothic One", cursive;
   color: white;

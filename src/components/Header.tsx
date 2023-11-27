@@ -1,27 +1,9 @@
 import LogOut from "./LogOut";
+import { useAppContext } from "../hooks/useAppContext";
 import "./Header.css";
-import { collection, getDocs, deleteDoc, query, doc } from "firebase/firestore";
-import { db } from "../firebase-config";
 
-const Header = ({ func }) => {
-  const collectionRef = collection(db, "data");
-
-  const handleClick = async () => {
-    try {
-      const querySnapshot = await getDocs(collectionRef);
-      querySnapshot.forEach(async (doc) => {
-        try {
-          const docRef = doc.ref; // Access the document reference directly
-          await deleteDoc(docRef);
-          console.log("Document successfully deleted:", doc.id);
-        } catch (error) {
-          console.error("Error deleting document:", error);
-        }
-      });
-    } catch (error) {
-      console.error("Error fetching documents:", error);
-    }
-  };
+const Header = () => {
+  const { showInfo, setShowInfo } = useAppContext();
 
   return (
     <header
@@ -32,17 +14,23 @@ const Header = ({ func }) => {
     justify-content-center  
     justify-content-lg-around
     bg-black 
-    bg-opacity-25"
+    bg-opacity-25
+    mb-3"
     >
       <h1 className="header-logo mx-auto mx-lg-0">
         PASSWORD<span>STASH</span>
       </h1>
-
-      <button onClick={handleClick} className="btn btn-light my-2 fw-bolder ">
-        INFO
-      </button>
-
-      <LogOut func={func} />
+      {!showInfo && (
+        <div className="d-flex">
+          <button
+            onClick={() => setShowInfo(true)}
+            className="btn btn-light my-2 mx-auto mx-lg-3 fw-bolder"
+          >
+            INFO
+          </button>
+          <LogOut />
+        </div>
+      )}
     </header>
   );
 };
