@@ -43,7 +43,7 @@ const Form = () => {
       setFieldThree("");
     };
 
-    keyword.length > 3
+    keyword.length > 2
       ? (mutation(formData), setKeywordIsTooShort(false))
       : setKeywordIsTooShort(true);
   };
@@ -112,8 +112,8 @@ const Form = () => {
             }`}
           >
             {keywordIsTooShort
-              ? "Keyword must be at least 2 characters long"
-              : "Keyword (must be at least 2 characters long)"}
+              ? "Keyword must be at least 3 characters long"
+              : "Keyword (must be at least 3 characters long)"}
             <input
               value={keyword}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>

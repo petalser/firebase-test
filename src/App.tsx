@@ -5,6 +5,7 @@ import Header from "./components/Header";
 import Info from "./components/Info";
 import { AppProvider } from "./components/ContextProvider";
 import { useAppContext } from "./hooks/useAppContext";
+import Footer from "./components/Footer";
 
 function App() {
   const { showInfo, isLoggedIn } = useAppContext();
@@ -22,6 +23,7 @@ function App() {
               <Body />
             </>
           )}
+          <Footer />
         </main>
       ) : (
         <Auth />

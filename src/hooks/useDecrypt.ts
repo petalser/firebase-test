@@ -6,10 +6,11 @@ export const useDecrypt = () => {
     try {
       const bytes = CryptoJS.AES.decrypt(message, key);
       const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-      console.log("decrypted: " + decrypted);
+
       return decrypted === "" ? message : decrypted;
     } catch (err) {
-      console.error("Decryption failed:", err);
+      console.error("Decryption failed:", err, message);
+
       return message;
     }
   };

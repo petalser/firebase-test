@@ -92,7 +92,11 @@ const Body = () => {
             }}
           />
         </div>
-        <button className="btn btn-sm bg-white m-3 fw-bolder" type="submit">
+        <button
+          disabled={inputValue.length < 3}
+          className="btn btn-sm bg-white m-3 fw-bolder"
+          type="submit"
+        >
           DECODE
         </button>
       </form>
